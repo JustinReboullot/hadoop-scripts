@@ -10,6 +10,8 @@ sudo apt-get install htop git -y
 git clone https://github.com/nojhan/liquidprompt.git
 echo 'source ~/liquidprompt/liquidprompt' >> .bashrc
 
+git clone https://github.com/MatthieuBizien/hadoop-scripts
+
 # Download java jdk
 sudo apt-get install openjdk-7-jdk -y
 cd /usr/lib/jvm
@@ -90,3 +92,14 @@ sudo -u hduser jps
 # Example
 sudo -u hduser /usr/local/hadoop/bin/hadoop jar /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.2.0.jar pi 20 100
 
+# Python basic wordcount
+cd ~/hadoop-scripts
+alias dfs='sudo -u hduser /usr/local/hadoop/bin/hdfs dfs'
+alias streaming='sudo -u hduser /usr/local/hadoop/bin/hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.2.0.jar'
+dfs -copyFromLocal data.txt sample
+streaming -file $PWD/mapper.py    -mapper $PWD/mapper.py \
+  -file $PWD/reducer.py   -reducer $PWD/reducer.py \
+  -input sample -output sample-wordcount-output
+dfs -cat sample-wordcount-output/part-00000
+dfs -rm -r sample-wordcount-output/
+dfs -rm sample
