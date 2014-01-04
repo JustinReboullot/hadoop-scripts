@@ -2,10 +2,11 @@
 set -e
 set -x
 
+# Generic configuration
 cd ~
 sudo apt-get update
 
-sudo apt-get install git -y
+sudo apt-get install htop git -y
 git clone https://github.com/nojhan/liquidprompt.git
 echo 'source ~/liquidprompt/liquidprompt' >> .bashrc
 
