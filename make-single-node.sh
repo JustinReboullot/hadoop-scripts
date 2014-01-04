@@ -57,6 +57,8 @@ sudo -u hduser sed -i.bak 's=<configuration>=<configuration>\<property>\<name>ma
 cd /home/hduser
 sudo mkdir -p mydata/hdfs/namenode
 sudo mkdir -p mydata/hdfs/datanode
+sudo chown hduser:hadoop mydata/ -R
+sudo chmod 755 mydata/ -R
 
 cd /usr/local/hadoop/etc/hadoop
 sudo -u hduser sed -i.bak 's=<configuration>=<configuration>\<property>\<name>dfs\.replication</name>\<value>1\</value>\</property>\<property>\<name>dfs\.namenode\.name\.dir</name>\<value>file:/home/hduser/mydata/hdfs/namenode</value>\</property>\<property>\<name>dfs\.datanode\.data\.dir</name>\<value>file:/home/hduser/mydata/hdfs/datanode</value>\</property>=g' hdfs-site.xml
