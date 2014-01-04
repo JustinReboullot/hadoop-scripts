@@ -68,13 +68,14 @@ sudo -u hduser sed -i.bak 's=<configuration>=<configuration>\<property>\<name>df
 sudo -u hduser /usr/local/hadoop/bin/hdfs namenode -format
 
 # Start Hadoop Service
-#sudo -u hduser start-dfs.sh
-#sudo -u hduser start-yarn.sh
+sudo -u hduser /usr/local/hadoop/sbin/start-dfs.sh
+sudo -u hduser /usr/local/hadoop/sbin/start-yarn.sh
 
 # Check status
-#sudo -u hduser jps
+sudo -u hduser jps
+(sudo -u hduser jps | grep -q DataNode) || exit 10
+(sudo -u hduser jps | grep -q " NameNode") || exit 15
 
 # Example
-# sudo -u hduser cd /usr/local/hadoop
-# sudo -u hduser hadoop jar ./share/hadoop/mapreduce/hadoop-mapreduce-examples-2.2.0.jar pi 2 5
+sudo -u hduser /usr/local/hadoop/bin/hadoop jar /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.2.0.jar pi 20 100
 
