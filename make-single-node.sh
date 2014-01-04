@@ -65,7 +65,7 @@ sudo -u hduser sed -i.bak 's=<configuration>=<configuration>\<property>\<name>df
 
 
 # Format Namenode
-#sudo sh -c 'hdfs namenode -format'
+sudo -u hduser /usr/local/hadoop/bin/hdfs namenode -format
 
 # Start Hadoop Service
 #sudo -u hduser start-dfs.sh
