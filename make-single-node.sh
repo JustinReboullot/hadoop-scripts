@@ -5,6 +5,10 @@ set -x
 cd ~
 sudo apt-get update
 
+sudo apt-get install git -y
+git clone https://github.com/nojhan/liquidprompt.git
+echo 'source ~/liquidprompt/liquidprompt' >> .bashrc
+
 # Download java jdk
 sudo apt-get install openjdk-7-jdk -y
 cd /usr/lib/jvm
