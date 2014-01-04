@@ -1,21 +1,27 @@
-cd ~ 
+#!/bin/bash
+set -e
+set -x
+
+cd ~
 sudo apt-get update
 
 # Download java jdk
-sudo apt-get install openjdk-7-jdk
+sudo apt-get install openjdk-7-jdk -y
 cd /usr/lib/jvm
 sudo ln -s java-7-openjdk-amd64 jdk
 
 # Uncommment to install ssh 
-sudo apt-get install openssh-server
+sudo apt-get install openssh-server -y
 
 # Add hadoop user
 sudo addgroup hadoop
-sudo adduser --ingroup hadoop hduser
+sudo useradd hduser -g hadoop -N
 sudo adduser hduser sudo
+sudo mkdir /home/hduser
+sudo chown hduser:hadoop /home/hduser
 
 # Generate keys
-sudo -u hduser ssh-keygen -t rsa -P ''
+sudo -u hduser ssh-keygen -t rsa -P '' -f /home/hduser/.ssh/id_rsa
 sudo sh -c 'cat /home/hduser/.ssh/id_rsa.pub >> /home/hduser/.ssh/authorized_keys'
 #ssh localhost
 
