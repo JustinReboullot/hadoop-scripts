@@ -43,14 +43,16 @@ sudo mv hadoop-2.2.0 hadoop
 sudo chown -R hduser:hadoop hadoop
 
 # Hadoop variables
-sudo sh -c 'echo export JAVA_HOME=/usr/lib/jvm/jdk/ >> /home/hduser/.bashrc'
-sudo sh -c 'echo export HADOOP_INSTALL=/usr/local/hadoop >> /home/hduser/.bashrc'
-sudo sh -c 'echo export PATH=\$PATH:\$HADOOP_INSTALL/bin >> /home/hduser/.bashrc'
-sudo sh -c 'echo export PATH=\$PATH:\$HADOOP_INSTALL/sbin >> /home/hduser/.bashrc'
-sudo sh -c 'echo export HADOOP_MAPRED_HOME=\$HADOOP_INSTALL >> /home/hduser/.bashrc'
-sudo sh -c 'echo export HADOOP_COMMON_HOME=\$HADOOP_INSTALL >> /home/hduser/.bashrc'
-sudo sh -c 'echo export HADOOP_HDFS_HOME=\$HADOOP_INSTALL >> /home/hduser/.bashrc'
-sudo sh -c 'echo export YARN_HOME=\$HADOOP_INSTALL >> /home/hduser/.bashrc'
+echo export JAVA_HOME=/usr/lib/jvm/jdk/ >> ~/.bashrc
+echo export HADOOP_INSTALL=/usr/local/hadoop >> ~/.bashrc
+echo export PATH=\$PATH:\$HADOOP_INSTALL/bin >> ~/.bashrc
+echo export PATH=\$PATH:\$HADOOP_INSTALL/sbin >> ~/.bashrc
+echo export HADOOP_MAPRED_HOME=\$HADOOP_INSTALL >> ~/.bashrc
+echo export HADOOP_COMMON_HOME=\$HADOOP_INSTALL >> ~/.bashrc
+echo export HADOOP_HDFS_HOME=\$HADOOP_INSTALL >> ~/.bashrc
+echo export YARN_HOME=\$HADOOP_INSTALL >> ~/.bashrc
+sudo cp ~/.bashrc /home/hduser/.bashrc
+sudo chown hduser:hadoop /home/hduser/.bashrc
 
 # Modify JAVA_HOME 
 cd /usr/local/hadoop/etc/hadoop
@@ -96,6 +98,7 @@ sudo -u hduser /usr/local/hadoop/bin/hadoop jar /usr/local/hadoop/share/hadoop/m
 cd ~/hadoop-scripts
 alias dfs='sudo -u hduser /usr/local/hadoop/bin/hdfs dfs'
 alias streaming='sudo -u hduser /usr/local/hadoop/bin/hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.2.0.jar'
+alias hadoop='sudo -u hduser /usr/local/hadoop/bin/hadoop'
 dfs -copyFromLocal data.txt sample
 streaming -file $PWD/mapper.py    -mapper $PWD/mapper.py \
   -file $PWD/reducer.py   -reducer $PWD/reducer.py \
