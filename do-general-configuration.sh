@@ -79,7 +79,7 @@ sudo chown hduser:hadoop mydata/ -R
 sudo chmod 755 mydata/ -R
 
 # General network configuration
-cat << END | sudo tail -a /etc/hosts >> /dev/null
+cat << END | sudo tee -a /etc/hosts >> /dev/null
 192.168.1.99     ubuntu
 192.168.1.100    master
 192.168.1.101    slave
@@ -93,7 +93,7 @@ cat << END | sudo tail -a /etc/hosts >> /dev/null
 192.168.1.108    slave-8
 192.168.1.109    slave-9
 END
-cat <<END | tee /etc/network/interfaces > /dev/null
+cat <<END | sudo tee /etc/network/interfaces > /dev/null
 auto lo
 iface eth0 inet static
 address $(hostname)
