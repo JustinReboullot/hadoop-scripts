@@ -21,6 +21,7 @@ sudo adduser hduser sudo
 sudo mkdir /home/hduser
 sudo chown hduser:hadoop /home/hduser
 usermod -d /home/hduser hduser
+echo "hduser:ensae" | sudo chpasswd
 
 # Generate keys
 sudo -u hduser ssh-keygen -t rsa -P '' -f /home/hduser/.ssh/id_rsa
@@ -76,5 +77,31 @@ sudo mkdir -p mydata/hdfs/namenode
 sudo mkdir -p mydata/hdfs/datanode
 sudo chown hduser:hadoop mydata/ -R
 sudo chmod 755 mydata/ -R
+
+# General network configuration
+cat << END | sudo tail -a /etc/hosts >> /dev/null
+192.168.1.99     ubuntu
+192.168.1.100    master
+192.168.1.101    slave
+192.168.1.101    slave-1
+192.168.1.102    slave-2
+192.168.1.103    slave-3
+192.168.1.104    slave-4
+192.168.1.105    slave-5
+192.168.1.106    slave-6
+192.168.1.107    slave-7
+192.168.1.108    slave-8
+192.168.1.109    slave-9
+END
+cat <<END | tee /etc/network/interfaces > /dev/null
+auto lo
+iface eth0 inet static
+address $(hostname)
+network 192.168.1.0
+netmask 255.255.255.0
+broadcast 127.0.1.255
+gateway 192.168.1.254
+END
+
 
 echo "general configuration done"
