@@ -3,10 +3,10 @@ set -e
 set -x
 
 # Everything is runned by hduser
-[ $(whoami) = hduser ] || exec sudo -u hduser $0
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+[ $(whoami) = hduser ] || exec sudo -u hduser $DIR/$(basename $0)
 
 # Check that we have java and hadoop installed
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ls $DIR/ >/dev/null || (echo "Directory not accessible"; exit 35)
 ls /usr/local/hadoop/bin/hadoop > /dev/null || (echo "hadoop not installed"; exit 4)
 ls /usr/lib/jvm/jdk > /dev/null || (echo "java not installed"; exit 3)
