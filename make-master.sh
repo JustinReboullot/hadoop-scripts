@@ -48,6 +48,7 @@ sleep 15
 ./sbin/start-yarn.sh
 (jps | grep -q " ResourceManager") || (echo "Error: ResourceManager not started";exit 15)
 (jps | grep -q " NodeManager") || (echo "Error: NodeManager not started";exit 15)
+(ssh hduser@slave jps | grep -q " NodeManager") || (echo "Error: NodeManager not started";exit 15)
 
 jps
 ssh hduser@slave jps
