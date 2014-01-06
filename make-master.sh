@@ -53,3 +53,16 @@ sleep 15
 jps
 ssh hduser@slave jps
 
+# Example
+./bin/hadoop jar ./share/hadoop/mapreduce/hadoop-mapreduce-examples-2.2.0.jar pi 20 100
+
+# Python basic wordcount
+ls $DIR/data.txt $DIR/mapper.py $DIR/reducer.py >/dev/null || (echo "files not found"; exit 30)
+./bin/hdfs dfs -copyFromLocal $DIR/data.txt sample
+./bin/hadoop jar ./share/hadoop/tools/lib/hadoop-streaming-2.2.0.jar \
+-file $DIR/mapper.py    -mapper $DIR/mapper.py \
+-file $DIR/reducer.py   -reducer $DIR/reducer.py \
+-input sample -output sample-wordcount-output
+./bin/hdfs dfs -cat sample-wordcount-output/part-00000
+./bin/hdfs dfs -rm -r sample-wordcount-output/
+./bin/hdfs dfs -rm sample
