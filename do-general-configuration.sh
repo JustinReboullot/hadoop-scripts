@@ -11,8 +11,6 @@ git clone https://github.com/nojhan/liquidprompt.git
 chmod a+r liquidprompt
 echo "source $PWD/liquidprompt/liquidprompt" >> .bashrc
 
-git clone https://github.com/MatthieuBizien/hadoop-scripts
-
 # Uncommment to install ssh 
 sudo apt-get install openssh-server -y
 
