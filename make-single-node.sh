@@ -2,107 +2,53 @@
 set -e
 set -x
 
-# Generic configuration
-cd ~
-sudo apt-get update
+# Everything is runned by
+sudo -u hduser -s
 
-sudo apt-get install htop git -y
-git clone https://github.com/nojhan/liquidprompt.git
-echo 'source ~/liquidprompt/liquidprompt' >> .bashrc
-
-git clone https://github.com/MatthieuBizien/hadoop-scripts
-
-# Download java jdk
-sudo apt-get install openjdk-7-jdk -y
-cd /usr/lib/jvm
-sudo ln -s java-7-openjdk-amd64 jdk
-
-# Uncommment to install ssh 
-sudo apt-get install openssh-server -y
-
-# Add hadoop user
-sudo addgroup hadoop
-sudo useradd hduser -g hadoop -N
-sudo adduser hduser sudo
-sudo mkdir /home/hduser
-sudo chown hduser:hadoop /home/hduser
-
-# Generate keys
-sudo -u hduser ssh-keygen -t rsa -P '' -f /home/hduser/.ssh/id_rsa
-sudo sh -c 'cat /home/hduser/.ssh/id_rsa.pub >> /home/hduser/.ssh/authorized_keys'
-#ssh localhost
-
-# Download Hadoop and set permissons
-cd ~
-if [ ! -f hadoop-2.2.0.tar.gz ]; then
-	wget http://www.trieuvan.com/apache/hadoop/common/hadoop-2.2.0/hadoop-2.2.0.tar.gz
-fi
-sudo tar vxzf hadoop-2.2.0.tar.gz -C /usr/local
-cd /usr/local
-sudo mv hadoop-2.2.0 hadoop
-sudo chown -R hduser:hadoop hadoop
-
-# Hadoop variables
-echo export JAVA_HOME=/usr/lib/jvm/jdk/ >> ~/.bashrc
-echo export HADOOP_INSTALL=/usr/local/hadoop >> ~/.bashrc
-echo export PATH=\$PATH:\$HADOOP_INSTALL/bin >> ~/.bashrc
-echo export PATH=\$PATH:\$HADOOP_INSTALL/sbin >> ~/.bashrc
-echo export HADOOP_MAPRED_HOME=\$HADOOP_INSTALL >> ~/.bashrc
-echo export HADOOP_COMMON_HOME=\$HADOOP_INSTALL >> ~/.bashrc
-echo export HADOOP_HDFS_HOME=\$HADOOP_INSTALL >> ~/.bashrc
-echo export YARN_HOME=\$HADOOP_INSTALL >> ~/.bashrc
-sudo cp ~/.bashrc /home/hduser/.bashrc
-sudo chown hduser:hadoop /home/hduser/.bashrc
-
-# Modify JAVA_HOME 
-cd /usr/local/hadoop/etc/hadoop
-sudo -u hduser sed -i.bak s=\${JAVA_HOME}=/usr/lib/jvm/jdk/=g hadoop-env.sh
-pwd
-
-# Check that Hadoop is installed
-/usr/local/hadoop/bin/hadoop version
+# Check that we have java and hadoop installed
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ls $DIR/ >/dev/null || (echo "Directory not accessible"; exit 35)
+ls /usr/local/hadoop/bin/hadoop > /dev/null || (echo "hadoop not installed"; exit 4)
+ls /usr/lib/jvm/jdk > /dev/null || (echo "java not installed"; exit 3)
 
 # Edit configuration files
-sudo -u hduser sed -i.bak 's=<configuration>=<configuration>\<property>\<name>fs\.default\.name\</name>\<value>hdfs://localhost:9000\</value>\</property>=g' core-site.xml 
-sudo -u hduser sed -i.bak 's=<configuration>=<configuration>\<property>\<name>yarn\.nodemanager\.aux-services</name>\<value>mapreduce_shuffle</value>\</property>\<property>\<name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>\<value>org\.apache\.hadoop\.mapred\.ShuffleHandler</value>\</property>=g' yarn-site.xml
-  
-sudo -u hduser cp mapred-site.xml.template mapred-site.xml
-sudo -u hduser sed -i.bak 's=<configuration>=<configuration>\<property>\<name>mapreduce\.framework\.name</name>\<value>yarn</value>\</property>=g' mapred-site.xml
- 
-cd /home/hduser
-sudo mkdir -p mydata/hdfs/namenode
-sudo mkdir -p mydata/hdfs/datanode
-sudo chown hduser:hadoop mydata/ -R
-sudo chmod 755 mydata/ -R
-
 cd /usr/local/hadoop/etc/hadoop
-sudo -u hduser sed -i.bak 's=<configuration>=<configuration>\<property>\<name>dfs\.replication</name>\<value>1\</value>\</property>\<property>\<name>dfs\.namenode\.name\.dir</name>\<value>file:/home/hduser/mydata/hdfs/namenode</value>\</property>\<property>\<name>dfs\.datanode\.data\.dir</name>\<value>file:/home/hduser/mydata/hdfs/datanode</value>\</property>=g' hdfs-site.xml
+sed -i.bak 's=<configuration>=<configuration>\<property>\<name>fs\.default\.name\</name>\<value>hdfs://localhost:9000\</value>\</property>=g' core-site.xml
+sed -i.bak 's=<configuration>=<configuration>\<property>\<name>yarn\.nodemanager\.aux-services</name>\<value>mapreduce_shuffle</value>\</property>\<property>\<name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>\<value>org\.apache\.hadoop\.mapred\.ShuffleHandler</value>\</property>=g' yarn-site.xml
+cp mapred-site.xml.template mapred-site.xml
+sed -i.bak 's=<configuration>=<configuration>\<property>\<name>mapreduce\.framework\.name</name>\<value>yarn</value>\</property>=g' mapred-site.xml
+sed -i.bak 's=<configuration>=<configuration>\<property>\<name>dfs\.replication</name>\<value>1\</value>\</property>\<property>\<name>dfs\.namenode\.name\.dir</name>\<value>file:/home/hduser/mydata/hdfs/namenode</value>\</property>\<property>\<name>dfs\.datanode\.data\.dir</name>\<value>file:/home/hduser/mydata/hdfs/datanode</value>\</property>=g' hdfs-site.xml
 
+cd /usr/local/hadoop/
 
 # Format Namenode
-sudo -u hduser /usr/local/hadoop/bin/hdfs namenode -format
+./bin/hdfs namenode -format
 
-# Start Hadoop Service
-sudo -u hduser /usr/local/hadoop/sbin/start-dfs.sh
-sudo -u hduser /usr/local/hadoop/sbin/start-yarn.sh
+# Start DFS
+./sbin/start-dfs.sh
+(jps | grep -q " DataNode") || (echo "Error: DataNode not started"; exit 15)
+(jps | grep -q " NameNode") || (echo "Error: NameNode not started";exit 15)
+(jps | grep -q " SecondaryNameNode") || (echo "Error: SecondaryNameNode not started";exit 15)
+
+# Start yarn
+sleep 15
+./sbin/start-yarn.sh
+(jps | grep -q " ResourceManager") || (echo "Error: ResourceManager not started";exit 15)
+(jps | grep -q " NodeManager") || (echo "Error: NodeManager not started";exit 15)
 
 # Check status
-sudo -u hduser jps
-(sudo -u hduser jps | grep -q DataNode) || exit 10
-(sudo -u hduser jps | grep -q " NameNode") || exit 15
+jps
 
 # Example
-sudo -u hduser /usr/local/hadoop/bin/hadoop jar /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.2.0.jar pi 20 100
+./bin/hadoop jar ./share/hadoop/mapreduce/hadoop-mapreduce-examples-2.2.0.jar pi 20 100
 
 # Python basic wordcount
-cd ~/hadoop-scripts
-alias dfs='sudo -u hduser /usr/local/hadoop/bin/hdfs dfs'
-alias streaming='sudo -u hduser /usr/local/hadoop/bin/hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.2.0.jar'
-alias hadoop='sudo -u hduser /usr/local/hadoop/bin/hadoop'
-dfs -copyFromLocal data.txt sample
-streaming -file $PWD/mapper.py    -mapper $PWD/mapper.py \
-  -file $PWD/reducer.py   -reducer $PWD/reducer.py \
+ls $DIR/data.txt $DIR/mapper.py $DIR/reducer.py >/dev/null || (echo "files not found"; exit 30)
+./bin/hdfs dfs -copyFromLocal $DIR/data.txt sample
+./bin/hadoop jar ./share/hadoop/tools/lib/hadoop-streaming-2.2.0.jar \
+  -file $DIR/mapper.py    -mapper $DIR/mapper.py \
+  -file $DIR/reducer.py   -reducer $DIR/reducer.py \
   -input sample -output sample-wordcount-output
-dfs -cat sample-wordcount-output/part-00000
-dfs -rm -r sample-wordcount-output/
-dfs -rm sample
+./bin/hdfs dfs -cat sample-wordcount-output/part-00000
+./bin/hdfs dfs -rm -r sample-wordcount-output/
+./bin/hdfs dfs -rm sample
