@@ -2,8 +2,8 @@
 set -e
 set -x
 
-# Everything is runned by
-sudo -u hduser -s
+# Everything is runned by hduser
+[ $(whoami) = hduser ] || exec sudo -u hduser $0
 
 # Check that we have java and hadoop installed
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
