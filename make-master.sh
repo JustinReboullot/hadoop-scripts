@@ -4,7 +4,7 @@ set -x
 
 echo "hduser:ensae" | sudo chpasswd
 
-# Configuration réseau
+# Network configuration
 cat << END | sudo tail -a /etc/hosts >> /dev/null
 192.168.1.100    master
 192.168.1.101    slave
@@ -17,7 +17,7 @@ sudo ifconfig eth0 $(hostname) netmask 255.255.255.0 up
 cat <<END | tee /etc/network/interfaces > /dev/null
 auto lo
 iface eth0 inet static
-address $(hostname)
+address 192.168.1.100
 network 192.168.1.0
 netmask 255.255.255.0
 broadcast 127.0.1.255
@@ -25,7 +25,7 @@ gateway 192.168.1.254
 END
 
 # everything from here is run by hduser
-sudo -u hduser -c
+sudo -u hduser -s
 
 ssh-copy-id -i /home/hduser/.ssh/id_rsa.pub hduser@slave || ( echo "Vérifiez que slave est bien lancé et le réseau des machines bien configurées dans VMware" && exit 30 );
 ssh hduser@master echo "connection to master ok"
