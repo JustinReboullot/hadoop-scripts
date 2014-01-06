@@ -7,9 +7,11 @@ cd ~
 sudo apt-get update
 
 sudo apt-get install htop git inetutils-traceroute -y
-git clone https://github.com/nojhan/liquidprompt.git
-chmod a+r liquidprompt
-echo "source $PWD/liquidprompt/liquidprompt" >> .bashrc
+
+( git clone https://github.com/nojhan/liquidprompt.git &&
+  chmod a+r liquidprompt &&
+  echo "source $PWD/liquidprompt/liquidprompt" >> .bashrc
+) || (echo "not important")
 
 # Uncommment to install ssh 
 sudo apt-get install openssh-server -y
@@ -26,7 +28,10 @@ echo "hduser:ensae" | sudo chpasswd
 # Generate keys
 sudo -u hduser ssh-keygen -t rsa -P '' -f /home/hduser/.ssh/id_rsa
 sudo -u hduser cp /home/hduser/.ssh/id_rsa.pub /home/hduser/.ssh/authorized_keys
-sudo -u hduser ssh hduser@localhost echo "connection ok"
+sudo -u hduser ssh hduser@localhost echo "connection ok" || \
+  sudo -u hduser ssh hduser@localhost echo "connection ok on 2nd try" || \
+  sudo -u hduser ssh hduser@localhost echo "connection ok on 3nd try" || \
+  (echo "not important")
 
 # Download java jdk
 sudo apt-get install openjdk-7-jdk -y
