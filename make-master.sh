@@ -9,6 +9,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Network configuration
 sudo hostname master
 hostname | sudo tee /etc/hostname >> /dev/null
+# DO THIS LINE AGAIN IF REBOOTING !
 sudo ifconfig eth0 $(hostname) netmask 255.255.255.0 up
 
 ssh-copy-id -i /home/hduser/.ssh/id_rsa.pub hduser@slave || ( echo "Vérifiez que slave est bien lancé et le réseau des machines bien configurées dans VMware" && exit 30 );
