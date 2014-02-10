@@ -99,15 +99,5 @@ cat << END | sudo tee -a /etc/hosts >> /dev/null
 192.168.1.108    slave-8
 192.168.1.109    slave-9
 END
-cat <<END | sudo tee /etc/network/interfaces > /dev/null
-auto lo
-iface eth0 inet static
-address $(hostname)
-network 192.168.1.0
-netmask 255.255.255.0
-broadcast 127.0.1.255
-gateway 192.168.1.254
-END
-
 
 echo "general configuration done"
