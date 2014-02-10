@@ -54,6 +54,7 @@ if [ ! -f hadoop-2.2.0.tar.gz ]; then
 	wget http://www.trieuvan.com/apache/hadoop/common/hadoop-2.2.0/hadoop-2.2.0.tar.gz
 fi
 sudo tar vxzf hadoop-2.2.0.tar.gz -C /usr/local
+rm hadoop-2.2.0.tar.gz
 cd /usr/local
 sudo mv hadoop-2.2.0 hadoop
 sudo chown -R hduser:hadoop hadoop
