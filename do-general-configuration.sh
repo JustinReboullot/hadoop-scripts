@@ -10,8 +10,9 @@ sudo apt-get install htop git inetutils-traceroute -y
 
 ( git clone https://github.com/nojhan/liquidprompt.git &&
   chmod a+r liquidprompt &&
-  echo "LP_HOSTNAME_ALWAYS=1" >> .config/liquidpromptrc &&
-  echo "source $PWD/liquidprompt/liquidprompt" >> .bashrc
+  mkdir -p ~/.config &&
+  echo "LP_HOSTNAME_ALWAYS=1" >> ~/.config/liquidpromptrc &&
+  echo "source ~/liquidprompt/liquidprompt" >> ~/.bashrc
 ) || (echo "not important")
 
 # Uncommment to install ssh 
