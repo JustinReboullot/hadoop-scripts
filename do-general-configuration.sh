@@ -37,6 +37,10 @@ sudo -u hduser ssh hduser@localhost echo "connection ok" || \
 
 # Download java jdk
 sudo apt-get install openjdk-7-jdk -y
+
+sudo update-alternatives --set java /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java
+sudo update-alternatives --set javac /usr/lib/jvm/java-7-openjdk-amd64/bin/javac
+
 cd /usr/lib/jvm
 if [ -d java-7-openjdk-amd64 ]; then
 sudo ln -s java-7-openjdk-amd64 jdk
