@@ -1,13 +1,14 @@
 #!/usr/bin/python
 
 import sys
-from numpy import matrix
+import numpy as np
 
 p = len(sys.argv)
 
+
 alpha = float(sys.argv[1])
-beta = matrix([float(i) for i in sys.argv[2:(p-1)]])
-gradtotal = matrix([0.0,0.0])
+beta = np.matrix([float(i) for i in sys.argv[2:(p-1)]])
+gradtotal = np.asmatrix(np.repeat(0,(p-2)))
 
 for line in sys.stdin:
 	grad = line.split('\t')[1]
@@ -15,7 +16,7 @@ for line in sys.stdin:
 	grad = grad.strip()
 	grad = grad.strip(']]')
 	grad = grad.split()
-	grad = matrix([float(i) for i in grad])
+	grad = np.matrix([float(i) for i in grad])
 	gradtotal += grad
 
 beta_next = beta + alpha*gradtotal
